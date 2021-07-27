@@ -14,9 +14,9 @@ namespace ConsoleToTextNonAuto
 		// Token: 0x06000001 RID: 1 RVA: 0x00002230 File Offset: 0x00000430
 		public override void Start()
 		{
-			if (File.Exists(CTTModule.defaultLogNonAuto))
+			if (File.Exists(CTTModule.defaultLog))
 			{
-				File.Delete(CTTModule.defaultLogNonAuto);
+				File.Delete(CTTModule.defaultLog);
 				CTTModule.Log("Deleting Old C.T.T File from when previously used.", CTTModule.TEXT_COLOR);
 			}
 			ETGModConsole.Commands.AddUnit("print_debug_console", new Action<string[]>(this.PrintDebugLog));
@@ -28,26 +28,26 @@ namespace ConsoleToTextNonAuto
 		// Token: 0x06000002 RID: 2 RVA: 0x000022CC File Offset: 0x000004CC
 		public void PrintDebugLog(string[] args)
 		{
-			if (File.Exists(CTTModule.defaultLogNonAuto))
+			if (File.Exists(CTTModule.defaultLog))
 			{
-				File.Delete(CTTModule.defaultLogNonAuto);
+				File.Delete(CTTModule.defaultLog);
 				CTTModule.Log("Deleting Old C.T.T File from when previously used.", CTTModule.TEXT_COLOR);
 			}
 			CTTModule.Log("Creating New C.T.T file.", CTTModule.TEXT_COLOR);
-			CTTModule.Log("C.T.T file should be located in." + CTTModule.defaultLogNonAuto, CTTModule.TEXT_COLOR);
+			CTTModule.Log("C.T.T file should be located in." + CTTModule.defaultLog, CTTModule.TEXT_COLOR);
 			CTTModule.DebugPrinter.ClearDebugLog();
 		}
 
 		// Token: 0x06000003 RID: 3 RVA: 0x0000232C File Offset: 0x0000052C
 		public void PrintDebugLogNullOnly(string[] args)
 		{
-			if (File.Exists(CTTModule.defaultLogNonAuto))
+			if (File.Exists(CTTModule.defaultLog))
 			{
-				File.Delete(CTTModule.defaultLogNonAuto);
+				File.Delete(CTTModule.defaultLog);
 				CTTModule.Log("Deleting Old C.T.T File from when previously used.", CTTModule.TEXT_COLOR);
 			}
 			CTTModule.Log("Creating New C.T.T (Nulls Only) file.", CTTModule.TEXT_COLOR);
-			CTTModule.Log("C.T.T file should be located in." + CTTModule.defaultLogNonAuto, CTTModule.TEXT_COLOR);
+			CTTModule.Log("C.T.T file should be located in." + CTTModule.defaultLog, CTTModule.TEXT_COLOR);
 			CTTModule.DebugPrinter.ClearDebugLogNullOnly();
 		}
 
@@ -56,7 +56,7 @@ namespace ConsoleToTextNonAuto
 		{
 			try
 			{
-				using (StreamWriter streamWriter = File.AppendText(CTTModule.defaultLogNonAuto))
+				using (StreamWriter streamWriter = File.AppendText(CTTModule.defaultLog))
 				{
 					streamWriter.WriteLine(text);
 				}
@@ -74,7 +74,7 @@ namespace ConsoleToTextNonAuto
 			orig(str);
 			try
 			{
-				using (StreamWriter streamWriter = File.AppendText(CTTModule.defaultLogNonAuto))
+				using (StreamWriter streamWriter = File.AppendText(CTTModule.defaultLog))
 				{
 					streamWriter.WriteLine(str);
 				}
@@ -112,13 +112,13 @@ namespace ConsoleToTextNonAuto
 		public static readonly string MOD_NAME = "Console To Text Mod (Code By NotABot!)";
 
 		// Token: 0x04000002 RID: 2
-		public static readonly string VERSION = "1.1";
+		public static readonly string VERSION = "1.2";
 
 		// Token: 0x04000003 RID: 3
 		public static readonly string TEXT_COLOR = "#71e300";
 
 		// Token: 0x04000004 RID: 4
-		private static string defaultLogNonAuto = Path.Combine(ETGMod.ResourcesDirectory, "ConsoleToText.txt");
+		private static string defaultLog = Path.Combine(ETGMod.ResourcesDirectory, "ConsoleToText.txt");
 
 		// Token: 0x02000003 RID: 3
 		public class DebugPrinter : ETGModDebugLogMenu
@@ -126,43 +126,36 @@ namespace ConsoleToTextNonAuto
 			// Token: 0x0600000B RID: 11 RVA: 0x00002454 File Offset: 0x00000654
 			public static void ClearDebugLog()
 			{
-				if (File.Exists(CTTModule.defaultLogNonAuto))
-                {
-					foreach (ETGModDebugLogMenu.LoggedText loggedText in ETGModDebugLogMenu._AllLoggedText)
+				foreach (ETGModDebugLogMenu.LoggedText loggedText in ETGModDebugLogMenu._AllLoggedText)
+				{
+					string logMessage = loggedText.LogMessage;
+					string stacktace = loggedText.Stacktace;
+					using (StreamWriter streamWriter = File.AppendText(CTTModule.defaultLog))
 					{
-						string logMessage = loggedText.LogMessage;
-						string stacktace = loggedText.Stacktace;
-						using (StreamWriter streamWriter = File.AppendText(CTTModule.defaultLogNonAuto))
+						streamWriter.WriteLine(logMessage.ToString());
+						if (loggedText.LogType == LogType.Exception)
 						{
-							streamWriter.WriteLine(logMessage.ToString());
-							if (loggedText.LogType == LogType.Exception)
-							{
-								streamWriter.WriteLine("   " + stacktace.ToString());
-							}
+							streamWriter.WriteLine("   " + stacktace.ToString());
 						}
 					}
 				}
-				
 			}
 
 			// Token: 0x0600000C RID: 12 RVA: 0x00002504 File Offset: 0x00000704
 			public static void ClearDebugLogNullOnly()
 			{
-				if (File.Exists(CTTModule.defaultLogNonAuto))
-                {
-					foreach (ETGModDebugLogMenu.LoggedText loggedText in ETGModDebugLogMenu._AllLoggedText)
+				foreach (ETGModDebugLogMenu.LoggedText loggedText in ETGModDebugLogMenu._AllLoggedText)
+				{
+					if (loggedText.LogType == LogType.Exception)
 					{
-						if (loggedText.LogType == LogType.Exception)
+						using (StreamWriter streamWriter = File.AppendText(CTTModule.defaultLog))
 						{
-							using (StreamWriter streamWriter = File.AppendText(CTTModule.defaultLogNonAuto))
+							string logMessage = loggedText.LogMessage;
+							string stacktace = loggedText.Stacktace;
+							streamWriter.WriteLine(logMessage.ToString());
+							if (loggedText.LogType == LogType.Exception)
 							{
-								string logMessage = loggedText.LogMessage;
-								string stacktace = loggedText.Stacktace;
-								streamWriter.WriteLine(logMessage.ToString());
-								if (loggedText.LogType == LogType.Exception)
-								{
-									streamWriter.WriteLine("   " + stacktace.ToString());
-								}
+								streamWriter.WriteLine("   " + stacktace.ToString());
 							}
 						}
 					}
